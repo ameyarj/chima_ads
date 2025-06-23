@@ -6,7 +6,7 @@ export type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 
 export interface TTSOptions {
   voice: TTSVoice;
-  speed: number; // 0.25 to 4.0
+  speed: number; 
   model: 'tts-1' | 'tts-1-hd';
 }
 
@@ -117,7 +117,7 @@ export class TTSService {
     }
 
     if (adScript.benefits && adScript.benefits.length > 0) {
-      const benefits = adScript.benefits.slice(0, 3); // Use up to 3 benefits
+      const benefits = adScript.benefits.slice(0, 3); 
       benefits.forEach(benefit => {
         parts.push(benefit);
       });
