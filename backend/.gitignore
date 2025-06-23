@@ -60,7 +60,7 @@ backend/dist/
 
 # Shared
 shared/dist/
-
+backend/videos/
 # Video templates build
 video-templates/dist/
 video-templates/.remotion/
