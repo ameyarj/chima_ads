@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { prisma } from '../config/database';
 import { ProductData, AdScript, VideoRequest, VideoResponse } from '@shared/types';
 import { llmService } from '../config/llm';
+import { ttsService, TTSService } from './ttsService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -24,13 +25,24 @@ export class VideoService {
     }
   }
 
-  async createVideo(request: Omit<VideoRequest, 'id'>): Promise<VideoResponse> {
+  async createVideo(request: Omit<VideoRequest, 'id'>, enableVoiceover: boolean = true): Promise<VideoResponse> {
     const id = uuidv4();
     
     try {
       // Generate ad script using LLM
       console.log('Generating ad script with LLM...');
       const adScript = await llmService.generateAdScript(request.productData);
+      
+      // Add voiceover configuration if enabled
+      if (enableVoiceover) {
+        const ttsText = TTSService.createTTSScript(adScript);
+        adScript.voiceover = {
+          enabled: true,
+          voice: (request.productData as any).voiceSettings?.voice || 'nova',
+          speed: (request.productData as any).voiceSettings?.speed || 1.0,
+          text: ttsText
+        };
+      }
       
       // Create database record
       const video = await prisma.video.create({
@@ -129,8 +141,33 @@ export class VideoService {
     template: string
   ): Promise<string> {
     const outputPath = path.join(this.videosDir, `${id}.mp4`);
+    let originalAudioPath: string | null = null;
+    let relativeAudioPath: string | null = null;
     
     try {
+      // Generate TTS audio if voiceover is enabled
+      if (adScript.voiceover?.enabled && adScript.voiceover.text) {
+        console.log('Generating TTS audio...');
+        const ttsResult = await ttsService.generateSpeech(adScript.voiceover.text, {
+          voice: adScript.voiceover.voice,
+          speed: adScript.voiceover.speed,
+          model: 'tts-1'
+        });
+        originalAudioPath = ttsResult.filePath;
+        console.log(`TTS audio generated: ${originalAudioPath}, duration: ${ttsResult.duration}s`);
+
+        // Copy audio file to video-templates/public folder for Remotion
+        const remotionPublicDir = path.join(process.cwd(), '..', 'video-templates', 'public');
+        await fs.mkdir(remotionPublicDir, { recursive: true });
+        
+        const audioFileName = path.basename(originalAudioPath);
+        const remotionAudioPath = path.join(remotionPublicDir, audioFileName);
+        await fs.copyFile(originalAudioPath, remotionAudioPath);
+        
+        // Update relativeAudioPath to be relative for Remotion
+        relativeAudioPath = audioFileName;
+      }
+
       // Create a data file for Remotion to use
       const dataPath = path.join(this.videosDir, `${id}-data.json`);
       const videoData = {
@@ -138,6 +175,7 @@ export class VideoService {
         adScript,
         aspectRatio,
         template,
+        audioPath: relativeAudioPath, // Include audio path for Remotion
       };
       
       await fs.writeFile(dataPath, JSON.stringify(videoData, null, 2));
@@ -171,9 +209,27 @@ export class VideoService {
       // Clean up data file
       await fs.unlink(dataPath);
       
+      // Clean up temporary audio file
+      if (originalAudioPath) {
+        try {
+          await fs.unlink(originalAudioPath);
+        } catch (error) {
+          console.warn('Failed to delete temporary audio file:', error);
+        }
+      }
+      
       return outputPath;
     } catch (error) {
       console.error('Video rendering error:', error);
+      
+      // Clean up temporary audio file on error
+      if (originalAudioPath) {
+        try {
+          await fs.unlink(originalAudioPath);
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
       
       // If Remotion fails, create a sample video for development
       // You can replace this with throwing an error in production

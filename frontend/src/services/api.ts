@@ -1,45 +1,111 @@
-import axios from 'axios';
-import { ProductData, VideoResponse, VideoRequest } from '@shared/types';
+import { ProductData, VideoResponse } from '../types';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30000,
-});
+export interface VideoGenerationRequest {
+  url: string;
+  voiceoverEnabled?: boolean;
+  voice?: string;
+  speed?: number;
+  aspectRatio?: '9:16' | '16:9';
+  template?: string;
+}
 
-export const apiService = {
-  // Scrape product data from URL
-  scrapeProduct: async (url: string): Promise<ProductData> => {
-    const response = await api.post('/scrape', { url });
-    return response.data;
-  },
+class ApiService {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    };
 
-  // Generate video from product data
-  generateVideo: async (request: Omit<VideoRequest, 'id'>): Promise<VideoResponse> => {
-    const response = await api.post('/generate-video', request);
-    return response.data;
-  },
+    const response = await fetch(url, config);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
 
-  // Get video status
-  getVideoStatus: async (videoId: string): Promise<VideoResponse> => {
-    const response = await api.get(`/video/${videoId}`);
-    return response.data;
-  },
+    return response.json();
+  }
 
-  // Download video
-  downloadVideo: async (videoId: string): Promise<Blob> => {
-    const response = await api.get(`/video/${videoId}/download`, {
-      responseType: 'blob',
+  async scrapeProduct(url: string): Promise<ProductData> {
+    const result = await this.request<ProductData>('/scrape', {
+      method: 'POST',
+      body: JSON.stringify({ url }),
     });
-    return response.data;
-  },
+    return result;
+  }
 
-  // Get all videos
-  getVideos: async (): Promise<VideoResponse[]> => {
-    const response = await api.get('/videos');
-    return response.data;
-  },
-};
+  async generateVideo(request: VideoGenerationRequest): Promise<VideoResponse> {
+    // First scrape the product data
+    const productData = await this.scrapeProduct(request.url);
+    
+    // Add voice settings to product data for backend access
+    if (request.voiceoverEnabled && (request.voice || request.speed)) {
+      (productData as ProductData & { voiceSettings?: { voice: string; speed: number } }).voiceSettings = {
+        voice: request.voice || 'nova',
+        speed: request.speed || 1.0
+      };
+    }
+    
+    // Then generate the video
+    const videoRequest = {
+      productData,
+      adScript: undefined, // Let the backend generate this
+      aspectRatio: request.aspectRatio || '16:9',
+      template: request.template || 'default',
+      voiceoverEnabled: request.voiceoverEnabled ?? true,
+    };
 
-export default apiService;
+    const result = await this.request<VideoResponse>('/generate-video', {
+      method: 'POST',
+      body: JSON.stringify(videoRequest),
+    });
+    
+    return result;
+  }
+
+  async getVideo(id: string): Promise<VideoResponse> {
+    return this.request<VideoResponse>(`/video/${id}`);
+  }
+
+  async getAllVideos(): Promise<VideoResponse[]> {
+    return this.request<VideoResponse[]>('/videos');
+  }
+
+  async downloadVideo(id: string): Promise<void> {
+    const url = `${API_BASE_URL}/video/${id}/download`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error('Failed to download video');
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `video-${id}.mp4`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+  }
+
+  async deleteVideo(id: string): Promise<void> {
+    await this.request(`/video/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  getVideoStreamUrl(id: string): string {
+    return `${API_BASE_URL}/video/${id}/file`;
+  }
+}
+
+export const apiService = new ApiService();

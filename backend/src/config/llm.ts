@@ -1,5 +1,6 @@
 import { LLMConfig } from '@shared/types';
 import OpenAI from 'openai';
+import { ttsService, TTSService } from '../services/ttsService';
 
 export interface LLMProvider {
   generateAdScript(productData: any): Promise<any>;
@@ -17,7 +18,7 @@ export class OpenAIProvider implements LLMProvider {
 
   async generateAdScript(productData: any) {
     const prompt = `
-Create a compelling video ad script for this product:
+Create a compelling 30-second video ad script for this product:
 
 Product: ${productData.title}
 Description: ${productData.description}
@@ -26,15 +27,16 @@ Features: ${productData.features.join(', ')}
 
 Generate a JSON response with the following structure:
 {
-  "hook": "Attention-grabbing opening line (5-8 words)",
-  "problem": "Problem this product solves (1-2 sentences)",
-  "solution": "How the product solves it (1-2 sentences)",
-  "benefits": ["benefit 1", "benefit 2", "benefit 3"],
-  "callToAction": "Strong call to action (5-8 words)",
+  "hook": "Attention-grabbing opening line (4-6 words max)",
+  "problem": "Problem this product solves (8-12 words max)",
+  "solution": "How the product solves it (10-15 words max)",
+  "benefits": ["benefit 1 (3-5 words)", "benefit 2 (3-5 words)"],
+  "callToAction": "Strong call to action (4-6 words max)",
   "duration": 30
 }
 
-Make it engaging, concise, and perfect for a 30-second video ad.
+IMPORTANT: Keep the script extremely concise for 30-second voiceover. Total word count should be 40-50 words maximum.
+Make it punchy, direct, and perfect for quick video consumption.
 `;
 
     const response = await this.client.chat.completions.create({

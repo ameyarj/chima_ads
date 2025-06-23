@@ -15,6 +15,12 @@ export interface AdScript {
   benefits: string[];
   callToAction: string;
   duration: number; // in seconds
+  voiceover?: {
+    enabled: boolean;
+    voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+    speed: number; // 0.25 to 4.0
+    text: string; // Combined script text for TTS
+  };
 }
 
 export interface VideoRequest {

@@ -29,7 +29,7 @@ export class VideoController {
 
   async generateVideo(req: Request, res: Response) {
     try {
-      const { productData, adScript, aspectRatio, template } = req.body;
+      const { productData, adScript, aspectRatio, template, voiceoverEnabled = true } = req.body;
 
       if (!productData) {
         return res.status(400).json({ error: 'Product data is required' });
@@ -49,7 +49,7 @@ export class VideoController {
         },
         aspectRatio: aspectRatio || '16:9',
         template: template || 'default'
-      });
+      }, voiceoverEnabled);
 
       res.json(videoResponse);
     } catch (error) {

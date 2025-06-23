@@ -1,27 +1,87 @@
-/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import "tailwindcss"; /* This one line replaces the three old directives */
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-gray-900 min-h-screen;
+  }
+  
+  * {
+    @apply border-border;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  /* Custom slider styles */
+  .slider-thumb {
+    @apply appearance-none h-3 bg-gray-200 rounded-lg outline-none;
   }
 
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  .slider-thumb::-webkit-slider-thumb {
+    @apply appearance-none w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full cursor-pointer shadow-lg border-2 border-white;
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
   }
 
-  .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  .slider-thumb::-moz-range-thumb {
+    @apply w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full cursor-pointer shadow-lg border-2 border-white;
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
   }
 
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+  /* Enhanced animations */
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-in {
+    animation: animate-in 0.3s ease-out;
+  }
+
+  /* Gradient text utilities */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-blue-500 to-purple-600 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply from-blue-600 to-purple-700;
   }
 }
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
