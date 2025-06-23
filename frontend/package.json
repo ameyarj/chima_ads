@@ -21,5 +21,8 @@
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10"
   }
 }

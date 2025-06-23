@@ -38,7 +38,7 @@ Make it engaging, concise, and perfect for a 30-second video ad.
 `;
 
     const response = await this.client.chat.completions.create({
-      model: 'gpt-o3-mini',
+      model: process.env.LLM_MODEL || 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -92,7 +92,7 @@ export class LLMService {
 
   private getConfig(): LLMConfig {
     const provider = (process.env.LLM_PROVIDER as 'openai' | 'anthropic') || 'openai';
-    const model = process.env.LLM_MODEL || 'gpt-o3-mini';
+    const model = process.env.LLM_MODEL || 'gpt-4.1';
     const apiKey = process.env.LLM_API_KEY;
     const baseUrl = process.env.LLM_BASE_URL;
 

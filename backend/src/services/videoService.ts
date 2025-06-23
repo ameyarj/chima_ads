@@ -130,27 +130,48 @@ export class VideoService {
   ): Promise<string> {
     const outputPath = path.join(this.videosDir, `${id}.mp4`);
     
-    // Create a data file for Remotion to use
-    const dataPath = path.join(this.videosDir, `${id}-data.json`);
-    const videoData = {
-      productData,
-      adScript,
-      aspectRatio,
-      template,
-    };
-    
-    await fs.writeFile(dataPath, JSON.stringify(videoData, null, 2));
-    
     try {
+      console.log('Creating mock video for development...');
+      
+      // For now, create a simple mock video file to test the pipeline
+      // In production, you would use the actual Remotion rendering
+      const mockVideoContent = Buffer.from('MOCK_VIDEO_DATA_' + id);
+      await fs.writeFile(outputPath, mockVideoContent);
+      
+      console.log(`Mock video created at: ${outputPath}`);
+      
+      // Simulate some processing time
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      return outputPath;
+      
+      // TODO: Uncomment this when Remotion is properly set up
+      /*
+      // Create a data file for Remotion to use
+      const dataPath = path.join(this.videosDir, `${id}-data.json`);
+      const videoData = {
+        productData,
+        adScript,
+        aspectRatio,
+        template,
+      };
+      
+      await fs.writeFile(dataPath, JSON.stringify(videoData, null, 2));
+      
       // Use Remotion CLI to render the video
       const remotionProjectPath = path.join(process.cwd(), '..', 'video-templates');
-      const command = `cd "${remotionProjectPath}" && npx remotion render ProductShowcase "${outputPath}" --props="${dataPath}"`;
+      const compositionId = aspectRatio === '9:16' ? 'ProductShowcaseVertical' : 'ProductShowcase';
+      const command = `cd "${remotionProjectPath}" && npx remotion render ${compositionId} "${outputPath}" --props="${dataPath}"`;
       
-      console.log('Executing Remotion render command...');
-      const { stdout, stderr } = await execAsync(command, { timeout: 300000 }); // 5 minute timeout
+      console.log('Executing Remotion render command:', command);
+      const { stdout, stderr } = await execAsync(command, { 
+        timeout: 300000, // 5 minute timeout
+        maxBuffer: 1024 * 1024 * 10 // 10MB buffer
+      });
       
-      if (stderr) {
-        console.warn('Remotion stderr:', stderr);
+      if (stderr && !stderr.includes('warn')) {
+        console.error('Remotion stderr:', stderr);
+        throw new Error(`Remotion error: ${stderr}`);
       }
       
       console.log('Remotion stdout:', stdout);
@@ -162,12 +183,9 @@ export class VideoService {
       await fs.unlink(dataPath);
       
       return outputPath;
+      */
     } catch (error) {
-      // Clean up data file on error
-      try {
-        await fs.unlink(dataPath);
-      } catch {}
-      
+      console.error('Video rendering error:', error);
       throw error;
     }
   }
