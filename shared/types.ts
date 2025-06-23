@@ -14,12 +14,12 @@ export interface AdScript {
   solution: string;
   benefits: string[];
   callToAction: string;
-  duration: number; // in seconds
+  duration: number; 
   voiceover?: {
     enabled: boolean;
     voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
-    speed: number; // 0.25 to 4.0
-    text: string; // Combined script text for TTS
+    speed: number; 
+    text: string; 
   };
 }
 

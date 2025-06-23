@@ -1,206 +1,168 @@
 # Chima AI Video Ad Generator
 
-Transform any product URL into compelling video advertisements using AI. Built with React, Node.js, and Remotion.
+Transform any product URL into compelling 30-second video advertisements with AI-generated scripts and professional voiceovers.
 
 ## 🚀 Features
 
-- **URL to Video**: Input any product URL and generate professional video ads
-- **AI-Powered Scripts**: Uses LLMs to create compelling ad copy
+- **URL to Video**: Input any product URL and generate professional video ads automatically
+- **AI-Powered Scripts**: Uses LLMs to create compelling ad copy optimized for 30-second videos  
+- **Professional Voiceovers**: 6 AI voice options (Alloy, Echo, Fable, Onyx, Nova, Shimmer) with speed control
+- **Background Music**: Integrated background music with proper audio mixing
 - **Multiple Aspect Ratios**: Support for 16:9 (horizontal) and 9:16 (vertical) videos
-- **Easy LLM Switching**: Simple configuration to switch between OpenAI, Anthropic, and other providers
-- **Real-time Preview**: Watch your video generation progress
+- **Real-time Progress**: Watch your video generation progress with live updates
 - **Download & Share**: Download generated videos in MP4 format
 
 ## 🛠 Tech Stack
 
 - **Frontend**: React + TypeScript + Tailwind CSS + Vite
-- **Backend**: Node.js + Express + TypeScript + Prisma
-- **Database**: SQLite
-- **Video Generation**: Remotion
-- **Web Scraping**: Puppeteer + Cheerio
-- **AI**: OpenAI API (easily switchable to other providers)
+- **Backend**: Node.js + Express + TypeScript + Prisma + SQLite
+- **Video Generation**: Remotion with professional templates
+- **Web Scraping**: Puppeteer + Cheerio (supports Amazon, Shopify)
+- **AI Services**: OpenAI API for script generation and text-to-speech
+- **Audio Processing**: AI voiceovers with background music mixing
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
-- OpenAI API key (or other LLM provider)
+- Node.js 18+
+- OpenAI API key
 
-## 🔧 Installation
+## 🔧 Quick Setup
 
-1. **Clone the repository**
+1. **Clone and install dependencies**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ameyarj/chima_ads
    cd chima_ads
+   
+   # Install all dependencies
+   cd frontend && npm install
+   cd ../backend && npm install  
+   cd ../video-templates && npm install
    ```
 
-2. **Install dependencies**
+2. **Configure environment**
    ```bash
-   # Install frontend dependencies
-   cd frontend
-   npm install
-
-   # Install backend dependencies
-   cd ../backend
-   npm install
-
-   # Install video template dependencies
-   cd ../video-templates
-   npm install
+   cd backend
    ```
-
-3. **Set up environment variables**
-   ```bash
-   cd ../backend
-   cp .env.example .env
-   ```
-
-   Edit `.env` and add your configuration:
+   
+   Edit `.env`:
    ```env
-   # LLM Configuration
    LLM_PROVIDER=openai
-   LLM_MODEL=gpt-3.5-turbo
+   LLM_MODEL=gpt-4.1
    LLM_API_KEY=your_openai_api_key_here
-
-   # Server Configuration
    PORT=5000
    NODE_ENV=development
    ```
 
-4. **Set up the database**
+3. **Setup database**
    ```bash
-   cd backend
    npx prisma migrate dev --name init
    npx prisma generate
    ```
 
-## 🚀 Running the Application
-
-1. **Start the backend server**
+4. **Add background music (optional)**
    ```bash
-   cd backend
-   npm run dev
+   # Add your background music file to:
+   cd ../video-templates/public/
+   # Place your background-music.mp3 file here
    ```
-   The backend will run on http://localhost:5000
 
-2. **Start the frontend development server**
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-   The frontend will run on http://localhost:3000
+## 🚀 Running the App
 
-3. **Test the video templates (optional)**
-   ```bash
-   cd video-templates
-   npm start
-   ```
-   This opens the Remotion preview at http://localhost:3000
-
-## 📖 Usage
-
-1. **Open the application** at http://localhost:3000
-2. **Enter a product URL** (supports Shopify stores, Amazon products, and general e-commerce sites)
-3. **Click "Generate Video Ad"** and wait for the AI to process
-4. **Preview your video** once generation is complete
-5. **Download** the MP4 file or create another video
-
-## 🔄 Switching LLM Providers
-
-The application supports easy switching between LLM providers:
-
-### OpenAI (Default)
-```env
-LLM_PROVIDER=openai
-LLM_MODEL=gpt-3.5-turbo
-LLM_API_KEY=your_openai_api_key
+**Start backend:**
+```bash
+cd backend && npm run dev
 ```
 
-### Anthropic Claude
-```env
-LLM_PROVIDER=anthropic
-LLM_MODEL=claude-3-haiku-20240307
-LLM_API_KEY=your_anthropic_api_key
-LLM_BASE_URL=https://api.anthropic.com
+**Start frontend:**
+```bash
+cd frontend && npm run dev
 ```
 
-### Custom/Local Models
-```env
-LLM_PROVIDER=openai
-LLM_MODEL=your-model-name
-LLM_API_KEY=your_api_key
-LLM_BASE_URL=http://localhost:1234/v1
-```
+Visit http://localhost:3000 to use the application.
 
-## 🎬 Video Templates
+## 📖 How to Use
 
-The application uses Remotion for video generation. Templates are located in `video-templates/src/templates/`:
+1. **Enter Product URL** - Paste any product page URL (Amazon, Shopify, etc.)
+2. **Configure Voiceover** - Choose AI voice (Nova, Alloy, etc.) and speech speed
+3. **Generate Video** - AI analyzes product and creates 30-second video ad
+4. **Preview & Download** - Watch your video and download MP4 file
 
-- **ProductShowcase**: Main template with animated text, product images, and call-to-action
-- Supports both 16:9 and 9:16 aspect ratios
-- Customizable animations and styling
+## 🎛 Voiceover Options
+
+Choose from 6 professional AI voices:
+- **Alloy**: Neutral, balanced tone
+- **Echo**: Clear, professional voice  
+- **Fable**: Warm, storytelling voice
+- **Onyx**: Deep, authoritative voice
+- **Nova**: Friendly, engaging voice ⭐ (default)
+- **Shimmer**: Bright, energetic voice
+
+Speed control: 0.5x to 2.5x (1.0x = normal speed)
+
+## 🎵 Audio Features
+
+- **Background Music**: Automatically mixed at 25% volume
+- **Professional Voiceover**: AI-generated speech at 85% volume  
+- **Perfect Sync**: Scripts optimized for exactly 30-second duration
+- **Quality Audio**: MP3 format with proper audio mixing
 
 ## 🏗 Project Structure
 
 ```
 chima_ads/
-├── frontend/          # React frontend application
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── services/      # API services
-│   │   └── hooks/         # Custom React hooks
-├── backend/           # Node.js backend API
-│   ├── src/
-│   │   ├── controllers/   # API controllers
-│   │   ├── services/      # Business logic
-│   │   ├── config/        # Configuration files
-│   │   └── routes/        # API routes
-├── video-templates/   # Remotion video templates
-│   └── src/templates/     # Video template components
-├── shared/           # Shared TypeScript types
-└── README.md
+├── frontend/              # React app with beautiful UI
+│   ├── src/components/    # URLInput, VideoPreview, VoiceoverOptions
+│   └── src/services/      # API integration layer
+├── backend/               # Node.js API server  
+│   ├── src/services/      # Video generation, TTS, scraping
+│   └── videos/            # Generated video files
+├── video-templates/       # Remotion video templates
+│   ├── src/templates/     # ProductShowcase template
+│   └── public/            # Audio files (TTS + background music)
+└── shared/               # TypeScript types
 ```
 
 ## 🔧 API Endpoints
 
-- `POST /api/scrape` - Scrape product data from URL
-- `POST /api/generate-video` - Generate video from product data
-- `GET /api/video/:id` - Get video status
-- `GET /api/videos` - Get all videos
-- `GET /api/video/:id/file` - Stream video file
+- `POST /api/scrape` - Extract product data from URL
+- `POST /api/generate-video` - Create video with AI script and voiceover
+- `GET /api/video/:id` - Check video generation status
+- `GET /api/video/:id/file` - Stream/preview video
 - `GET /api/video/:id/download` - Download video file
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+**Video generation issues:**
+- Ensure all npm packages are installed in all 3 directories
+- Check OpenAI API key and quota
+- Verify internet connection for image scraping
 
-1. **Video generation fails**
-   - Check that all dependencies are installed in `video-templates/`
-   - Ensure Remotion can access the internet for external images
-   - Check backend logs for detailed error messages
+**Audio not working:**
+- Check that TTS is enabled in voiceover options
+- Verify OpenAI API key has TTS access
+- Ensure background music file is in `video-templates/public/`
 
-2. **Scraping doesn't work**
-   - Some websites block automated scraping
-   - Try with different product URLs
-   - Check if the website requires authentication
+**Scraping fails:**
+- Try different product URLs
+- Some sites block automated scraping
+- Check if URL is publicly accessible
 
-3. **LLM API errors**
-   - Verify your API key is correct
-   - Check your API quota/billing
-   - Ensure the model name is correct
+## 🎬 Supported Platforms
 
-## 📝 Development
+✅ **Amazon products** 
+✅ **Shopify stores**  
+ 
 
-### Adding New Video Templates
+## 🔄 Switching LLM Providers
 
-1. Create a new component in `video-templates/src/templates/`
-2. Register it in `video-templates/src/Root.tsx`
-3. Update the backend to support the new template
+Update `.env` to use different AI providers:
 
-### Adding New LLM Providers
+**Anthropic Claude:**
+```env
+LLM_PROVIDER=anthropic
+LLM_API_KEY=your_anthropic_key
+```
 
-1. Create a new provider class in `backend/src/config/llm.ts`
-2. Implement the `LLMProvider` interface
-3. Add the provider to the factory method
-
-
+**Local models:**
+```env
+LLM_BASE_URL=http://localhost:1234/v1

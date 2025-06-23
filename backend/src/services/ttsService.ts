@@ -48,13 +48,11 @@ export class TTSService {
       console.log('Generating TTS audio with options:', options);
       console.log('Text length:', text.length);
 
-      // Validate text length (OpenAI TTS has a 4096 character limit)
       if (text.length > 4000) {
         text = text.substring(0, 4000) + '...';
         console.warn('Text truncated to fit TTS limits');
       }
 
-      // Generate speech using OpenAI TTS
       const response = await this.client.audio.speech.create({
         model: options.model,
         voice: options.voice,
@@ -63,15 +61,12 @@ export class TTSService {
         response_format: 'mp3',
       });
 
-      // Generate unique filename
       const filename = `tts-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.mp3`;
       const filepath = path.join(this.audioDir, filename);
 
-      // Convert response to buffer and save
       const buffer = Buffer.from(await response.arrayBuffer());
       await fs.writeFile(filepath, buffer);
 
-      // Estimate duration based on text length and speed
       const estimatedDuration = TTSService.estimateDuration(text, options.speed);
       
       console.log(`TTS audio generated: ${filepath}`);
@@ -106,45 +101,36 @@ export class TTSService {
     }
   }
 
-  // Helper method to create a script suitable for TTS (optimized for 30 seconds)
   static createTTSScript(adScript: any): string {
     const parts = [];
 
-    // Start with hook (5-8 words max)
     if (adScript.hook) {
       parts.push(adScript.hook);
     }
 
-    // Quick problem statement (10-15 words max)
     if (adScript.problem) {
-      const shortProblem = adScript.problem.split('.')[0]; // Take first sentence only
-      parts.push(shortProblem);
+      parts.push(adScript.problem);
     }
 
-    // Concise solution (15-20 words max)
     if (adScript.solution) {
-      const shortSolution = adScript.solution.split('.')[0]; // Take first sentence only
-      parts.push(shortSolution);
+      parts.push(adScript.solution);
     }
 
-    // Top 2 benefits only (10-15 words max)
     if (adScript.benefits && adScript.benefits.length > 0) {
-      const topBenefits = adScript.benefits.slice(0, 2); // Only use first 2 benefits
-      parts.push(`${topBenefits.join(' and ')}`);
+      const benefits = adScript.benefits.slice(0, 3); // Use up to 3 benefits
+      benefits.forEach(benefit => {
+        parts.push(benefit);
+      });
     }
 
-    // Strong call to action (5-8 words max)
     if (adScript.callToAction) {
       parts.push(adScript.callToAction);
     }
 
-    // Join with brief pauses for natural speech
     return parts.join('. ');
   }
 
-  // Helper method to estimate speech duration
   static estimateDuration(text: string, speed: number = 1.0): number {
-    // Average speaking rate is about 150 words per minute
     const wordsPerMinute = 150 * speed;
     const wordCount = text.split(/\s+/).length;
     return Math.ceil((wordCount / wordsPerMinute) * 60);

@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer';
-import * as cheerio from 'cheerio';
 import axios from 'axios';
 import { ProductData, ScrapingResult } from '@shared/types';
 
@@ -58,10 +57,10 @@ export class ScrapingService {
         
         return {
           title,
-          description: description.substring(0, 500), // Limit description length
+          description: description.substring(0, 500), 
           price,
-          images: images.slice(0, 5), // Limit to 5 images
-          features: features.slice(0, 5) // Limit to 5 features
+          images: images.slice(0, 5), 
+          features: features.slice(0, 5) 
         };
       });
       
@@ -84,7 +83,6 @@ export class ScrapingService {
     const page = await browser.newPage();
     
     try {
-      // Set user agent to avoid blocking
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       
@@ -146,23 +144,19 @@ export class ScrapingService {
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       
       const productData = await page.evaluate(() => {
-        // Try multiple selectors for title
         const title = document.querySelector('h1')?.textContent?.trim() || 
                      document.querySelector('.product-title')?.textContent?.trim() || 
                      document.querySelector('[data-testid="product-title"]')?.textContent?.trim() || 
                      document.title || '';
         
-        // Try multiple selectors for description
         const description = document.querySelector('.product-description')?.textContent?.trim() || 
                            document.querySelector('.description')?.textContent?.trim() || 
                            document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
         
-        // Try multiple selectors for price
         const price = document.querySelector('.price')?.textContent?.trim() || 
                      document.querySelector('.product-price')?.textContent?.trim() || 
                      document.querySelector('[class*="price"]')?.textContent?.trim() || '';
         
-        // Get images
         const imageElements = document.querySelectorAll('img');
         const images: string[] = [];
         imageElements.forEach(img => {
@@ -177,7 +171,6 @@ export class ScrapingService {
           }
         });
         
-        // Get features from lists
         const featureElements = document.querySelectorAll('ul li, .features li, .specs li');
         const features: string[] = [];
         featureElements.forEach(el => {
@@ -227,7 +220,6 @@ export class ScrapingService {
         productData = await this.scrapeGeneric(url);
       }
       
-      // Validate that we got meaningful data
       if (!productData.title || productData.title.length < 3) {
         throw new Error('Could not extract product title');
       }

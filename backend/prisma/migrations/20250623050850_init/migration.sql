@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "videos" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "url" TEXT NOT NULL,

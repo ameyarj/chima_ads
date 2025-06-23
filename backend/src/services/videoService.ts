@@ -29,11 +29,9 @@ export class VideoService {
     const id = uuidv4();
     
     try {
-      // Generate ad script using LLM
       console.log('Generating ad script with LLM...');
       const adScript = await llmService.generateAdScript(request.productData);
       
-      // Add voiceover configuration if enabled
       if (enableVoiceover) {
         const ttsText = TTSService.createTTSScript(adScript);
         adScript.voiceover = {
@@ -44,7 +42,6 @@ export class VideoService {
         };
       }
       
-      // Create database record
       const video = await prisma.video.create({
         data: {
           id,
@@ -57,7 +54,6 @@ export class VideoService {
         },
       });
 
-      // Start video generation in background
       this.generateVideoAsync(id, request.productData, adScript, request.aspectRatio, request.template);
 
       return {
@@ -68,7 +64,6 @@ export class VideoService {
     } catch (error) {
       console.error('Error creating video:', error);
       
-      // Update database with error
       await prisma.video.upsert({
         where: { id },
         update: {
@@ -106,10 +101,8 @@ export class VideoService {
     try {
       console.log(`Starting video generation for ${id}`);
       
-      // Generate video using Remotion
       const videoPath = await this.renderVideo(id, productData, adScript, aspectRatio, template);
       
-      // Update database with success
       await prisma.video.update({
         where: { id },
         data: {
@@ -122,7 +115,6 @@ export class VideoService {
     } catch (error) {
       console.error(`Video generation failed for ${id}:`, error);
       
-      // Update database with error
       await prisma.video.update({
         where: { id },
         data: {
@@ -145,7 +137,6 @@ export class VideoService {
     let relativeAudioPath: string | null = null;
     
     try {
-      // Generate TTS audio if voiceover is enabled
       if (adScript.voiceover?.enabled && adScript.voiceover.text) {
         console.log('Generating TTS audio...');
         const ttsResult = await ttsService.generateSpeech(adScript.voiceover.text, {
@@ -156,7 +147,6 @@ export class VideoService {
         originalAudioPath = ttsResult.filePath;
         console.log(`TTS audio generated: ${originalAudioPath}, duration: ${ttsResult.duration}s`);
 
-        // Copy audio file to video-templates/public folder for Remotion
         const remotionPublicDir = path.join(process.cwd(), '..', 'video-templates', 'public');
         await fs.mkdir(remotionPublicDir, { recursive: true });
         
@@ -164,27 +154,23 @@ export class VideoService {
         const remotionAudioPath = path.join(remotionPublicDir, audioFileName);
         await fs.copyFile(originalAudioPath, remotionAudioPath);
         
-        // Update relativeAudioPath to be relative for Remotion
         relativeAudioPath = audioFileName;
       }
 
-      // Create a data file for Remotion to use
       const dataPath = path.join(this.videosDir, `${id}-data.json`);
       const videoData = {
         productData,
         adScript,
         aspectRatio,
         template,
-        audioPath: relativeAudioPath, // Include audio path for Remotion
+        audioPath: relativeAudioPath, 
       };
       
       await fs.writeFile(dataPath, JSON.stringify(videoData, null, 2));
       
-      // Use Remotion CLI to render the video
       const remotionProjectPath = path.join(process.cwd(), '..', 'video-templates');
       const compositionId = aspectRatio === '9:16' ? 'ProductShowcaseVertical' : 'ProductShowcase';
       
-      // Ensure we're in the correct directory and use the proper command
       const command = process.platform === 'win32' 
         ? `cd /d "${remotionProjectPath}" && npx remotion render ${compositionId} "${outputPath}" --props="${dataPath}"`
         : `cd "${remotionProjectPath}" && npx remotion render ${compositionId} "${outputPath}" --props="${dataPath}"`;
@@ -192,8 +178,8 @@ export class VideoService {
       console.log('Executing Remotion render command:', command);
       
       const { stdout, stderr } = await execAsync(command, { 
-        timeout: 300000, // 5 minute timeout
-        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+        timeout: 300000, 
+        maxBuffer: 1024 * 1024 * 10, 
         shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/sh'
       });
       
@@ -203,13 +189,10 @@ export class VideoService {
       
       console.log('Remotion stdout:', stdout);
       
-      // Verify the video file was created
       await fs.access(outputPath);
       
-      // Clean up data file
       await fs.unlink(dataPath);
       
-      // Clean up temporary audio file
       if (originalAudioPath) {
         try {
           await fs.unlink(originalAudioPath);
@@ -222,17 +205,14 @@ export class VideoService {
     } catch (error) {
       console.error('Video rendering error:', error);
       
-      // Clean up temporary audio file on error
       if (originalAudioPath) {
         try {
           await fs.unlink(originalAudioPath);
         } catch {
-          // Ignore cleanup errors
+          
         }
       }
       
-      // If Remotion fails, create a sample video for development
-      // You can replace this with throwing an error in production
       if (process.env.NODE_ENV === 'development') {
         console.warn('Remotion failed, creating sample video for development...');
         return await this.createSampleVideo(outputPath);
@@ -243,8 +223,7 @@ export class VideoService {
   }
 
   private async createSampleVideo(outputPath: string): Promise<string> {
-    // Create a minimal valid MP4 file for testing
-    // This is a tiny valid MP4 that shows a black frame
+    
     const minimalMp4 = Buffer.from([
       0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D,
       0x00, 0x00, 0x02, 0x00, 0x69, 0x73, 0x6F, 0x6D, 0x69, 0x73, 0x6F, 0x32,
@@ -302,7 +281,6 @@ export class VideoService {
       return null;
     }
 
-    // Verify file exists
     try {
       await fs.access(video.videoPath);
       return video.videoPath;
@@ -321,16 +299,14 @@ export class VideoService {
         return false;
       }
 
-      // Delete video file if it exists
       if (video.videoPath) {
         try {
           await fs.unlink(video.videoPath);
         } catch {
-          // File might not exist, continue with database deletion
+          
         }
       }
 
-      // Delete database record
       await prisma.video.delete({
         where: { id },
       });

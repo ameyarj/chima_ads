@@ -1,6 +1,5 @@
 import { LLMConfig } from '@shared/types';
 import OpenAI from 'openai';
-import { ttsService, TTSService } from '../services/ttsService';
 
 export interface LLMProvider {
   generateAdScript(productData: any): Promise<any>;
@@ -27,16 +26,16 @@ Features: ${productData.features.join(', ')}
 
 Generate a JSON response with the following structure:
 {
-  "hook": "Attention-grabbing opening line (4-6 words max)",
-  "problem": "Problem this product solves (8-12 words max)",
-  "solution": "How the product solves it (10-15 words max)",
-  "benefits": ["benefit 1 (3-5 words)", "benefit 2 (3-5 words)"],
-  "callToAction": "Strong call to action (4-6 words max)",
+  "hook": "Attention-grabbing opening line (6-10 words)",
+  "problem": "Problem this product solves (12-18 words)",
+  "solution": "How the product solves it (15-25 words)",
+  "benefits": ["benefit 1 (5-8 words)", "benefit 2 (5-8 words)", "benefit 3 (5-8 words)"],
+  "callToAction": "Strong call to action (8-12 words)",
   "duration": 30
 }
 
-IMPORTANT: Keep the script extremely concise for 30-second voiceover. Total word count should be 40-50 words maximum.
-Make it punchy, direct, and perfect for quick video consumption.
+IMPORTANT: Create a script that will last approximately 25-30 seconds when spoken. Total word count should be 70-90 words.
+Make it engaging and conversational while maintaining energy throughout.
 `;
 
     const response = await this.client.chat.completions.create({

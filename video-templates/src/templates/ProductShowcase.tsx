@@ -45,12 +45,12 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
   const frame = useCurrentFrame();
   const {fps, durationInFrames, width, height} = useVideoConfig();
   
-  // Calculate timing for different sections
-  const hookDuration = fps * 3; // 3 seconds
-  const problemDuration = fps * 5; // 5 seconds
-  const solutionDuration = fps * 8; // 8 seconds
-  const benefitsDuration = fps * 10; // 10 seconds
-  const ctaDuration = fps * 4; // 4 seconds
+  // timing for different sections
+  const hookDuration = fps * 3; 
+  const problemDuration = fps * 5; 
+  const solutionDuration = fps * 8; 
+  const benefitsDuration = fps * 10; 
+  const ctaDuration = fps * 4; 
   
   const hookStart = 0;
   const problemStart = hookStart + hookDuration;
@@ -102,7 +102,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
   const bgRotation = interpolate(frame, [0, durationInFrames], [0, 360]);
   const bgScale = interpolate(frame, [0, durationInFrames], [1, 1.5]);
 
-  // Responsive styles based on aspect ratio
   const isVertical = aspectRatio === '9:16';
   const containerStyle: React.CSSProperties = {
     position: 'relative',
@@ -182,20 +181,22 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
 
   return (
     <AbsoluteFill style={containerStyle}>
-      {/* Add background music (optional) */}
-      {/* Note: Add background-music.mp3 to public folder for background music */}
+      <Audio
+        src={staticFile('30-SECONDS-2020-08-10_-_Go_Beyond_-_David_Fesliyan.mp3')}
+        startFrom={0}
+        endAt={durationInFrames}
+        volume={0.25}
+      />
 
-      {/* Add voiceover audio track if available */}
       {audioPath && (
         <Audio
           src={staticFile(audioPath)}
           startFrom={0}
           endAt={durationInFrames}
-          volume={0.9}
+          volume={0.85}
         />
       )}
 
-      {/* Animated gradient background */}
       <div
         style={{
           position: 'absolute',
@@ -214,7 +215,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
         }}
       />
 
-      {/* Dark overlay for better text contrast */}
       <div
         style={{
           position: 'absolute',
@@ -226,7 +226,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
         }}
       />
 
-      {/* Floating particles effect */}
       {[...Array(6)].map((_, i) => (
         <div
           key={i}
@@ -253,7 +252,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 10 }}>
-        {/* Hook Section */}
         {frame >= hookStart && frame < problemStart && (
           <div
             style={{
@@ -280,7 +278,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
           </div>
         )}
 
-        {/* Problem Section */}
         {frame >= problemStart && frame < solutionStart && (
           <div
             style={{
@@ -294,7 +291,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
           </div>
         )}
 
-        {/* Solution Section */}
         {frame >= solutionStart && frame < benefitsStart && (
           <div
             style={{
@@ -312,7 +308,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
           </div>
         )}
 
-        {/* Benefits Section */}
         {frame >= benefitsStart && frame < ctaStart && (
           <div
             style={{
@@ -342,7 +337,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
           </div>
         )}
 
-        {/* Call to Action Section */}
         {frame >= ctaStart && (
           <div
             style={{
@@ -370,7 +364,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
         )}
       </div>
 
-      {/* Animated light rays */}
       <div
         style={{
           position: 'absolute',

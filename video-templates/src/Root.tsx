@@ -8,7 +8,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ProductShowcase"
         component={ProductShowcase as unknown as React.ComponentType<Record<string, unknown>>}
-        durationInFrames={900} // 30 seconds at 30fps
+        durationInFrames={900} 
         fps={30}
         width={1920}
         height={1080}
@@ -38,7 +38,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ProductShowcaseVertical"
         component={ProductShowcase as unknown as React.ComponentType<Record<string, unknown>>}
-        durationInFrames={900} // 30 seconds at 30fps
+        durationInFrames={900} 
         fps={30}
         width={1080}
         height={1920}
