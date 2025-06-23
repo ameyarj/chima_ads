@@ -44,9 +44,8 @@ function App() {
 
       setCurrentVideo(videoResponse);
       
-      // Poll for video completion
       const pollVideo = async (videoId: string) => {
-        const maxAttempts = 60; // 5 minutes with 5-second intervals
+        const maxAttempts = 60; 
         let attempts = 0;
         
         const poll = async () => {
@@ -65,7 +64,7 @@ function App() {
             
             attempts++;
             if (attempts < maxAttempts) {
-              setTimeout(poll, 5000); // Poll every 5 seconds
+              setTimeout(poll, 5000); 
             } else {
               setError('Video generation timed out');
               setCurrentState('error');

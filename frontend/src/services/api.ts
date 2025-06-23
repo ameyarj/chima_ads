@@ -42,10 +42,8 @@ class ApiService {
   }
 
   async generateVideo(request: VideoGenerationRequest): Promise<VideoResponse> {
-    // First scrape the product data
     const productData = await this.scrapeProduct(request.url);
     
-    // Add voice settings to product data for backend access
     if (request.voiceoverEnabled && (request.voice || request.speed)) {
       (productData as ProductData & { voiceSettings?: { voice: string; speed: number } }).voiceSettings = {
         voice: request.voice || 'nova',
@@ -53,10 +51,9 @@ class ApiService {
       };
     }
     
-    // Then generate the video
     const videoRequest = {
       productData,
-      adScript: undefined, // Let the backend generate this
+      adScript: undefined, 
       aspectRatio: request.aspectRatio || '16:9',
       template: request.template || 'default',
       voiceoverEnabled: request.voiceoverEnabled ?? true,
