@@ -1,5 +1,7 @@
 import { LLMConfig } from '@shared/types';
 import OpenAI from 'openai';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export interface LLMProvider {
   generateAdScript(productData: any): Promise<any>;
