@@ -1,0 +1,28 @@
+{
+  "name": "chima-video-templates",
+  "version": "1.0.0",
+  "description": "Remotion video templates for Chima AI Video Generator",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "remotion preview",
+    "build": "remotion bundle",
+    "render": "remotion render",
+    "upgrade": "remotion upgrade"
+  },
+  "keywords": ["remotion", "video", "templates"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/bundler": "^4.0.242",
+    "@remotion/cli": "^4.0.242",
+    "@remotion/renderer": "^4.0.242",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "remotion": "^4.0.242"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "typescript": "^5.8.3"
+  }
+}

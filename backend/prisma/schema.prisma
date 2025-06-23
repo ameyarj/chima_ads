@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  url         String   // Original product URL
+  productData String   // JSON string of ProductData
+  adScript    String   // JSON string of AdScript
+  aspectRatio String   // "9:16" or "16:9"
+  template    String   // Template name used
+  status      String   // "processing" | "completed" | "failed"
+  videoPath   String?  // Path to generated video file
+  error       String?  // Error message if failed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("videos")
+}
