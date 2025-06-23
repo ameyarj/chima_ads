@@ -64,6 +64,7 @@ Transform any product URL into compelling 30-second video advertisements with AI
    # Add your background music file to:
    cd ../video-templates/public/
    # Place your background-music.mp3 file here
+   # one music is available in github as demo.
    ```
 
 ## 🚀 Running the App
