@@ -38,7 +38,6 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ video, onDownload, onCreate
         url: window.location.href,
       });
     } else {
-      // Fallback to copying to clipboard
       navigator.clipboard.writeText(window.location.href);
     }
   };

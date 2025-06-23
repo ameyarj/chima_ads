@@ -36,12 +36,6 @@ const URLInput: React.FC<URLInputProps> = ({ onSubmit, loading = false }) => {
     onSubmit(url.trim());
   };
 
-  const exampleUrls = [
-    'https://www.apple.com/iphone-15-pro/',
-    'https://www.nike.com/t/air-max-270-mens-shoes',
-    'https://www.amazon.com/dp/B08N5WRWNW'
-  ];
-
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-white/50">
@@ -105,23 +99,7 @@ const URLInput: React.FC<URLInputProps> = ({ onSubmit, loading = false }) => {
               )}
             </button>
           </div>
-        </form>
-
-        {/* Example URLs */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-700 mb-4 text-center">Try these example URLs:</p>
-          <div className="grid gap-3">
-            {exampleUrls.map((exampleUrl, index) => (
-              <button
-                key={index}
-                onClick={() => setUrl(exampleUrl)}
-                className="text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200 text-sm text-gray-600 hover:text-gray-800"
-              >
-                {exampleUrl}
-              </button>
-            ))}
-          </div>
-        </div>
+        </form>       
 
         {/* Supported Platforms */}
         <div className="mt-8 pt-8 border-t border-gray-200">
@@ -135,10 +113,6 @@ const URLInput: React.FC<URLInputProps> = ({ onSubmit, loading = false }) => {
               <div className="flex items-center space-x-2 bg-orange-50 px-3 py-2 rounded-lg">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 <span className="text-sm text-orange-700 font-medium">Amazon</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-blue-700 font-medium">WooCommerce</span>
               </div>
               <div className="flex items-center space-x-2 bg-purple-50 px-3 py-2 rounded-lg">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
