@@ -37,14 +37,50 @@ export class ScrapingService {
                      document.querySelector('.product-price')?.textContent?.trim() || 
                      document.querySelector('[data-testid="price"]')?.textContent?.trim() || '';
         
-        const imageElements = document.querySelectorAll('img[src*="product"], img[alt*="product"], .product-image img, .product__media img');
         const images: string[] = [];
-        imageElements.forEach(img => {
+        
+        const shopifyImages = document.querySelectorAll(`
+          img[src*="product"], img[alt*="product"], 
+          .product-image img, .product__media img, .product__photo img,
+          .product-single__photo img, .product-form__image img,
+          .featured-image img, .product-gallery img,
+          [data-zoom] img, .zoomContainer img,
+          .slick-slide img, .swiper-slide img
+        `);
+        
+        shopifyImages.forEach(img => {
           const src = (img as HTMLImageElement).src;
-          if (src && !src.includes('data:') && !images.includes(src)) {
+          if (src && !src.includes('data:') && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
             images.push(src);
           }
         });
+        
+        if (images.length === 0) {
+          const allImages = document.querySelectorAll('img');
+          const candidateImages: Array<{src: string, size: number}> = [];
+          
+          allImages.forEach(img => {
+            const src = (img as HTMLImageElement).src;
+            const alt = (img as HTMLImageElement).alt?.toLowerCase() || '';
+            
+            if (src && !src.includes('data:') && !src.includes('logo') && !src.includes('icon') && !alt.includes('logo')) {
+              const width = (img as HTMLImageElement).naturalWidth || (img as HTMLImageElement).width;
+              const height = (img as HTMLImageElement).naturalHeight || (img as HTMLImageElement).height;
+              const size = width * height;
+              
+              if (size > 15000) { 
+                candidateImages.push({src, size});
+              }
+            }
+          });
+          
+          candidateImages.sort((a, b) => b.size - a.size);
+          candidateImages.slice(0, 5).forEach(img => {
+            if (!images.includes(img.src)) {
+              images.push(img.src);
+            }
+          });
+        }
         
         const featureElements = document.querySelectorAll('.product-features li, .features li, .product-details li, ul li');
         const features: string[] = [];
@@ -157,19 +193,70 @@ export class ScrapingService {
                      document.querySelector('.product-price')?.textContent?.trim() || 
                      document.querySelector('[class*="price"]')?.textContent?.trim() || '';
         
-        const imageElements = document.querySelectorAll('img');
         const images: string[] = [];
-        imageElements.forEach(img => {
+        
+        const productImages = document.querySelectorAll(`
+          img[src*="product"], img[alt*="product"], 
+          .product-image img, .product-gallery img, .product__media img,
+          [class*="product"] img, [data-testid*="product"] img,
+          .gallery img, .slider img, .carousel img,
+          .main-image img, .hero-image img
+        `);
+        
+        productImages.forEach(img => {
           const src = (img as HTMLImageElement).src;
-          const alt = (img as HTMLImageElement).alt?.toLowerCase() || '';
-          if (src && !src.includes('data:') && 
-              (alt.includes('product') || src.includes('product') || 
-               img.closest('.product-image, .product-gallery, [class*="product"]'))) {
-            if (!images.includes(src)) {
-              images.push(src);
-            }
+          if (src && !src.includes('data:') && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
+            images.push(src);
           }
         });
+        
+        if (images.length === 0) {
+          const allImages = document.querySelectorAll('img');
+          const candidateImages: Array<{src: string, size: number}> = [];
+          
+          allImages.forEach(img => {
+            const src = (img as HTMLImageElement).src;
+            const alt = (img as HTMLImageElement).alt?.toLowerCase() || '';
+            const className = (img as HTMLImageElement).className?.toLowerCase() || '';
+            
+            if (src && !src.includes('data:') && 
+                !src.includes('logo') && !src.includes('icon') && 
+                !src.includes('avatar') && !src.includes('badge') &&
+                !alt.includes('logo') && !alt.includes('icon') &&
+                !className.includes('logo') && !className.includes('icon')) {
+              
+              const width = (img as HTMLImageElement).naturalWidth || (img as HTMLImageElement).width;
+              const height = (img as HTMLImageElement).naturalHeight || (img as HTMLImageElement).height;
+              const size = width * height;
+              
+              if (size > 10000) { 
+                candidateImages.push({src, size});
+              }
+            }
+          });
+          
+          candidateImages.sort((a, b) => b.size - a.size);
+          candidateImages.slice(0, 5).forEach(img => {
+            if (!images.includes(img.src)) {
+              images.push(img.src);
+            }
+          });
+        }
+        
+        if (images.length === 0) {
+          const fallbackImages = document.querySelectorAll('img[src]');
+          fallbackImages.forEach(img => {
+            const src = (img as HTMLImageElement).src;
+            const alt = (img as HTMLImageElement).alt?.toLowerCase() || '';
+            
+            if (src && !src.includes('data:') && 
+                !src.includes('logo') && !src.includes('icon') && 
+                !alt.includes('logo') && !alt.includes('icon') &&
+                images.length < 3) {
+              images.push(src);
+            }
+          });
+        }
         
         const featureElements = document.querySelectorAll('ul li, .features li, .specs li');
         const features: string[] = [];
